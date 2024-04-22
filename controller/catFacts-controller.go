@@ -22,15 +22,17 @@ func New(service service.CatFactsService) CatFactsController {
 	return &catFactsController{service: service}
 }
 
-func (c *catFactsController) GetFacts(ctx *gin.Context) []entity.Fact {
-	var details struct {
-		Num  string `json:"count"`
-		Lang string `json:"lang"`
-	}
+type getFactsParams struct {
+	Count string `json:"count" binding:"gte=1, lte=10"`
+	Lang  string `json:"lang"`
+}
 
-	if err := ctx.BindJSON(&details); err != nil {
+func (c *catFactsController) GetFacts(ctx *gin.Context) []entity.Fact {
+	details := new(getFactsParams)
+
+	if err := ctx.ShouldBindJSON(details); err != nil {
 		fmt.Println("Details 1: ", details)
-		return c.service.GetFacts("0", "")
+		return c.service.GetFacts(0, "")
 	} else {
 		fmt.Println("Details 2: ", details)
 		return c.service.GetFacts(details.Num, details.Lang)
