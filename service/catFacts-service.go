@@ -23,25 +23,28 @@ func New() CatFactsService {
 }
 
 func (service *catFactsService) GetFacts(count string, lang string) []entity.Fact {
+	newFacts := GetMeowFacts(count, lang)
+	service.CatFacts = append(service.CatFacts, newFacts...)
+	return service.CatFacts
+}
+
+func GetMeowFacts(count string, lang string) []entity.Fact {
 	// connect to meowfacts api
 	api := gopencils.Api("https://meowfacts.herokuapp.com")
 
 	// create a new pointer to the response struct
-	newFacts := new(catFactsService)
+	newFacts := []entity.Fact{}
 
 	// make a get request and unmarshal json response into response struct
 	_, err := api.Res("", newFacts).Get(map[string]string{"count": count, "lang": lang})
-	fmt.Println("Foi à app", newFacts)
-	fmt.Println("Err", err)
 
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		for _, fact := range newFacts.CatFacts {
+		for _, fact := range newFacts {
 			fmt.Println("fact:", fact)
 		}
 	}
 
-	service.CatFacts = append(service.CatFacts, newFacts.CatFacts...)
-	return service.CatFacts
+	return newFacts
 }
