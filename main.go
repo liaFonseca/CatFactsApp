@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/liaFonseca/CatFactsApp/controller"
 	"github.com/liaFonseca/CatFactsApp/service"
@@ -22,7 +24,12 @@ func main() {
 
 	// creates a Get endpoint (/catFacts)
 	server.GET("/catFacts", func(ctx *gin.Context) {
-		ctx.JSON(200, catFactsController.GetFacts(ctx))
+		if catFacts, err := catFactsController.GetFacts(ctx); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{"message": catFacts})
+		}
+
 	})
 
 	// starts the server

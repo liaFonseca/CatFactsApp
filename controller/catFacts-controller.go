@@ -11,7 +11,7 @@ import (
 )
 
 type CatFactsController interface {
-	GetFacts(ctx *gin.Context) []entity.Fact
+	GetFacts(ctx *gin.Context) ([]entity.Fact, error)
 }
 
 type catFactsController struct {
@@ -23,18 +23,18 @@ func New(service service.CatFactsService) CatFactsController {
 }
 
 type getFactsParams struct {
-	Count string `json:"count" binding:"gte=1, lte=10"`
+	Count int    `json:"count" binding:"gte=0,lte=10"`
 	Lang  string `json:"lang"`
 }
 
-func (c *catFactsController) GetFacts(ctx *gin.Context) []entity.Fact {
+func (c *catFactsController) GetFacts(ctx *gin.Context) ([]entity.Fact, error) {
 	details := new(getFactsParams)
 
 	if err := ctx.ShouldBindJSON(details); err != nil {
 		fmt.Println("Details 1: ", details)
-		return c.service.GetFacts(0, "")
+		return []entity.Fact{}, err
 	} else {
 		fmt.Println("Details 2: ", details)
-		return c.service.GetFacts(details.Num, details.Lang)
+		return c.service.GetFacts(details.Count, details.Lang), nil
 	}
 }

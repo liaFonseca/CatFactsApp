@@ -40,6 +40,9 @@ func GetMeowFacts(count int, lang string) []entity.Fact {
 	// create a new pointer to the response struct
 	newFacts := new(MeowFacts)
 
+	if count == 0 {
+		count = 1
+	}
 	// make a get request and unmarshal json response into response struct
 	_, err := api.Res("", newFacts).Get(map[string]string{"count": strconv.Itoa(count), "lang": lang})
 
