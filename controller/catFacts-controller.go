@@ -35,6 +35,6 @@ func (c *catFactsController) GetFacts(ctx *gin.Context) ([]entity.Fact, error) {
 		return []entity.Fact{}, err
 	} else {
 		fmt.Println("Details 2: ", details)
-		return c.service.GetFacts(details.Count, details.Lang), nil
+		return c.service.GetFacts(details.Count, details.Lang)
 	}
 }
