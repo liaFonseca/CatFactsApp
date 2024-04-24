@@ -22,15 +22,30 @@ func main() {
 		ctx.JSON(200, gin.H{"message": "OK!"})
 	})
 
-	// creates a Get endpoint (/catFacts)
-	server.GET("/catFacts", func(ctx *gin.Context) {
-		if catFacts, err := catFactsController.GetFacts(ctx); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		} else {
-			ctx.JSON(http.StatusOK, gin.H{"message": catFacts})
-		}
+	// load static assets:
+	//    -> serves the css and js file
+	server.Static("/css", "templates/css")
+	server.Static("/js", "templates/js")
+	//    -> loads html files
+	server.LoadHTMLGlob("templates/*.html")
 
-	})
+	apiRoutes := server.Group("/api")
+	{
+		// creates a Get endpoint (/catFacts)
+		apiRoutes.GET("/catFacts", func(ctx *gin.Context) {
+			if catFacts, err := catFactsController.GetFacts(ctx); err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			} else {
+				ctx.JSON(http.StatusOK, gin.H{"message": catFacts})
+			}
+
+		})
+	}
+
+	viewRoutes := server.Group("/view")
+	{
+		viewRoutes.GET("/catFacts", catFactsController.ShowAll)
+	}
 
 	// starts the server
 	server.Run(":8080")

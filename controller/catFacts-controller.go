@@ -4,6 +4,7 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/liaFonseca/CatFactsApp/entity"
@@ -12,6 +13,7 @@ import (
 
 type CatFactsController interface {
 	GetFacts(ctx *gin.Context) ([]entity.Fact, error)
+	ShowAll(ctx *gin.Context)
 }
 
 type catFactsController struct {
@@ -23,18 +25,33 @@ func New(service service.CatFactsService) CatFactsController {
 }
 
 type getFactsParams struct {
-	Count int    `json:"count" binding:"gte=0,lte=10"`
-	Lang  string `json:"lang"`
+	Count int    `json:"count" form:"count" binding:"gte=0,lte=10"`
+	Lang  string `json:"lang" form:"lang"`
 }
 
 func (c *catFactsController) GetFacts(ctx *gin.Context) ([]entity.Fact, error) {
 	details := new(getFactsParams)
 
-	if err := ctx.ShouldBindJSON(details); err != nil {
+	if err := ctx.ShouldBindQuery(details); err != nil {
+
 		fmt.Println("Details 1: ", details)
 		return []entity.Fact{}, err
 	} else {
 		fmt.Println("Details 2: ", details)
-		return c.service.GetFacts(details.Count, details.Lang)
+		return c.service.GetNewFacts(details.Count, details.Lang)
 	}
+}
+
+func (c *catFactsController) ShowAll(ctx *gin.Context) {
+	facts := c.service.GetFacts()
+	lang := c.service.GetLanguages()
+
+	data := gin.H{
+		"Title": "Cat Facts",
+		"Facts": facts,
+		"Lang":  lang,
+	}
+
+	// send current Cat Facts to the html page
+	ctx.HTML(http.StatusOK, "index.html", data)
 }
