@@ -23,8 +23,7 @@ func main() {
 	})
 
 	// load static assets:
-	//    -> serves the css and js file
-	server.Static("/css", "templates/css")
+	//    -> serves the js file
 	server.Static("/js", "templates/js")
 	//    -> loads html files
 	server.LoadHTMLGlob("templates/*.html")
@@ -34,7 +33,7 @@ func main() {
 		// creates a Get endpoint (/catFacts)
 		apiRoutes.GET("/catFacts", func(ctx *gin.Context) {
 			if catFacts, err := catFactsController.GetFacts(ctx); err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
 				ctx.JSON(http.StatusOK, gin.H{"message": catFacts})
 			}
