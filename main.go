@@ -17,11 +17,6 @@ func main() {
 	// creates a gin default server
 	server := gin.Default()
 
-	// creates a Get endpoint (/test)
-	server.GET("/test", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{"message": "OK!"})
-	})
-
 	// load static assets:
 	//    -> serves the js file
 	server.Static("/js", "templates/js")
