@@ -1,11 +1,14 @@
 package main
 
 import (
+	"html/template"
+	"io/fs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/liaFonseca/CatFactsApp/controller"
 	"github.com/liaFonseca/CatFactsApp/service"
+	"github.com/liaFonseca/CatFactsApp/templates"
 )
 
 var (
@@ -16,12 +19,17 @@ var (
 func main() {
 	// creates a gin default server
 	server := gin.Default()
+	server.SetTrustedProxies([]string{"localhost"})
 
 	// load static assets:
 	//    -> serves the js file
-	server.Static("/js", "templates/js")
-	//    -> loads html files
-	server.LoadHTMLGlob("templates/*.html")
+	jsDir, _ := fs.Sub(templates.TempDir, "js")
+	fileSystem := http.FS(jsDir)
+	server.StaticFS("/js", fileSystem)
+
+	//    -> loads html filess
+	templHTML := template.Must(template.ParseFS(templates.TempDir, "*.html"))
+	server.SetHTMLTemplate(templHTML)
 
 	apiRoutes := server.Group("/api")
 	{
@@ -40,6 +48,11 @@ func main() {
 	{
 		viewRoutes.GET("/catFacts", catFactsController.ShowAll)
 	}
+
+	server.GET("/", func(c *gin.Context) {
+		c.Request.URL.Path = "/view/catFacts"
+		server.HandleContext(c)
+	})
 
 	// starts the server
 	server.Run(":8080")
