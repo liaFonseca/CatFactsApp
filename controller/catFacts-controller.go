@@ -3,7 +3,6 @@ package controller
 // the controller has the handlers for the API endpoints
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,11 +32,8 @@ func (c *catFactsController) GetFacts(ctx *gin.Context) ([]entity.Fact, error) {
 	details := new(getFactsParams)
 
 	if err := ctx.ShouldBindQuery(details); err != nil {
-
-		fmt.Println("Details 1: ", details)
 		return []entity.Fact{}, err
 	} else {
-		fmt.Println("Details 2: ", details)
 		return c.service.GetNewFacts(details.Count, details.Lang)
 	}
 }

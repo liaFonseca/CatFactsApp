@@ -1,6 +1,6 @@
 
 const btnGetFacts = document.getElementById('get-facts-btn');
-console.log('entrou aqui')
+
 const getFacts = () => {
     const count = document.getElementById('count').valueAsNumber 
     const lang = document.getElementById('lang').value
