@@ -55,5 +55,5 @@ func main() {
 	})
 
 	// starts the server
-	server.Run(":8080")
+	server.Run(":80")
 }
